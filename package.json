@@ -1,6 +1,6 @@
 {
   "name": "cc_co",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "flow-control based on es5",
   "main": "index.js",
   "scripts": {
