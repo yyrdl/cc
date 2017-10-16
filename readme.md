@@ -6,10 +6,10 @@
 
 ## 用法
 
+
 浏览器中的使用示例:
 
-`<script type="text/javascript" src ="https://git"></script>`
-
+首先将项目目录下的index.js文件引入你的页面.
 
 ```js
 cc(function(exec,ctx,resume){
