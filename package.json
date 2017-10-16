@@ -1,0 +1,24 @@
+{
+  "name": "cc_co",
+  "version": "1.0.0",
+  "description": "flow-control based on es5",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yyrdl/cc.git"
+  },
+  "keywords": [
+    "flow-control",
+    "async",
+    "sync"
+  ],
+  "author": "yyrdl",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yyrdl/cc/issues"
+  },
+  "homepage": "https://github.com/yyrdl/cc#readme"
+}

@@ -11,6 +11,8 @@
 
 首先将项目目录下的index.js文件引入你的页面.
 
+>node.js端 获取方式：`npm install cc_co`
+
 ```js
 cc(function(exec,ctx,resume){
 
@@ -25,20 +27,20 @@ cc(function(exec,ctx,resume){
 
 包含所有功能的例子:
 
-```
+```js
 
 
-/**
- * 异步操作的代表函数,简单做过加和操作
- * */
+
+ 
+// 异步操作的代表函数,简单做过加和操作
+
 function async_func(a, func) {
 	setTimeout(function () {
 		func(a+Math.floor(Math.random()*100));
 	}, 100);
 }
-/**
- * 以同步的方式书写异步执行的代码
-*/
+
+// 以同步的方式书写异步执行的代码
 function sync_code() {
 
     return cc(function (exec,ctx,resume) {
@@ -88,9 +90,8 @@ function sync_code() {
     });
 
 }
-/**
- *  调用上面的函数，也演示了如何嵌套使用
-*/
+
+//调用上面的函数，也演示了如何嵌套使用
 cc(function (exec,ctx) {
      
     exec(sync_code()).assign("result");
@@ -100,5 +101,14 @@ cc(function (exec,ctx) {
     })
 
 })();
+
+//或者直接调用
+sync_code(function(err,result){
+    if(err){
+	  console.log(err);
+	}else{
+	  console.log(result);
+	}
+});
 ```
 
