@@ -15,7 +15,7 @@
 
 ```js
 cc(function(exec,ctx,resume){
-
+   //执行一个异步请求
    exec.async(ajax.get).assign("page")("/page",resume);
    
    exec(function(){
@@ -32,7 +32,7 @@ cc(function(exec,ctx,resume){
 
 
  
-// 异步操作的代表函数,简单做过加和操作
+// 异步操作的代表函数,简单做加和操作
 
 function async_func(a, func) {
 	setTimeout(function () {
@@ -52,25 +52,25 @@ function sync_code() {
 
         let i = 0;
 
-        /**
-         * 不能使用语言自带的循环
-         * */
+        
+        //注意不建议使用语言自带的循环，因为cc的工作原理是先获得指令序列再执行，直接使用for可能引发错误
+         
         exec.for(function () {
 
-            if(i>= 5){
+            if( i >= 5){
                 exec.break();
                 //or
                 //exec.return(ctx.v);
             }
-            /**
-             * 执行一个异步方法，100和 resume是他的调用参数，并将结果命名为"v"
-             * */
+            
+			//执行一个异步方法，100和 resume是他的调用参数，并将结果命名为"v",后面通过ctx去获得
+			
             exec.async(async_func).assign("v")(100,resume);
-
+            // 这里用了一下箭头函数，考虑兼容性的话应该使用function
             exec(()=>{
-                /**
-                 * 获取上一步执行的结果并打印
-                 * */
+                
+                //获取上一步执行的结果并打印
+				
                 console.log("v:"+ctx.v);
                 i++;
             });
@@ -112,3 +112,9 @@ sync_code(function(err,result){
 });
 ```
 
+# 原理
+
+一个操作指令由操作方法，参数，返回值三大部分组成，无论异步还是同步函数都是如此。指令序列可以同步书写，cc只需要保证指令是按照书写的顺序执行即可。
+所以cc第一步先获得指令序列，第二步是按顺序解释执行指令。需要思考的是代码的书写方式，既要满足功能预期，又不能比回调嵌套复杂,最终设计成这样的形式。
+
+__exec的每次调用都生成一条指令，指令是按书写的逻辑顺序依次执行的，非exec表述的逻辑不保证执行顺序。__
