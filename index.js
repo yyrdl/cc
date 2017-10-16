@@ -418,7 +418,9 @@
 		    var ins = cpu.stack.nextInstruction();
 
 		    if (!ins) {
-			  return null;
+
+			  return cpu.exit();
+
 		    }
 
 			if (insType.async === ins._type) {
