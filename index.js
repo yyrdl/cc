@@ -52,7 +52,7 @@
 	};
 	Instruction.prototype.result = function () {
 		if(this._result_name){
-            return this._ctx.v[this._result_name];
+            return this._ctx.GVGS[this._result_name];
         }
         return this._result;
 	};
@@ -191,7 +191,7 @@
 
 						}else{
 							/**
-							 * no more instuctions
+							 * no more instructions
 							 * */
 							break;
 						}
@@ -465,14 +465,14 @@
 }
 
 try {
-	if (exports) {
-		module.exports = cc;
-	}
+
+	module.exports = cc;
+
 } catch (e) {}
 
 try {
-	if (window) {
-		window.cc = cc;
-	}
+
+	window.cc = cc;
+
 } catch (e) {}
 })();
