@@ -348,46 +348,45 @@
 			var ins = new Instruction(turn, insType.loop);
 			cpu.stack.push(ins);
 		};
+		exec.break = function () {
 
-	exec.break = function () {
-
-		var ins = new Instruction(function () {
+			var ins = new Instruction(function () {
 				cpu.breakCurrentLoop();
 			}, insType.break);
 
-		cpu.stack.push(ins);
-	};
-
-	exec.async = function (instruction) {
-
-		if ("function" != typeof instruction) {
-
-			throw new TypeError("Wrong type, Can't exec this!");
-		}
-
-		var ins = new Instruction(instruction, insType.async);
-
-		cpu.stack.push(ins);
-
-		var func = function () {
-			ins._args = [].slice.call(arguments);
+			cpu.stack.push(ins);
 		};
 
-		func.assign = function (name) {
-			ins.assign(name);
+		exec.async = function (instruction) {
+
+			if ("function" != typeof instruction) {
+
+				throw new TypeError("Wrong type, Can't exec this!");
+			}
+
+			var ins = new Instruction(instruction, insType.async);
+
+			cpu.stack.push(ins);
+
+			var func = function () {
+				ins._args = [].slice.call(arguments);
+			};
+
+			func.assign = function (name) {
+				ins.assign(name);
+				return func;
+			};
+
+			func._ins = ins;
+
 			return func;
 		};
 
-		func._ins = ins;
+		exec.return  = function () {
 
-		return func;
-	};
+			var result = [].slice.call(arguments);
 
-	exec.return  = function () {
-
-		var result = [].slice.call(arguments);
-
-		var ins = new Instruction(function () {
+			var ins = new Instruction(function () {
 				var temp = [];
 				for (var i = 0; i < result.length; i++) {
 
@@ -401,76 +400,76 @@
 				cpu.exit(null, temp);
 			}, insType.normal);
 
-		cpu.stack.push(ins);
+			cpu.stack.push(ins);
 
-	};
+		};
 
-	function _resume() {
-		cpu.resume([].slice.call(arguments));
-	}
-
-	func(exec, cpu.GVGS, _resume);
-
-	function run() {
-
-		var ins = cpu.stack.nextInstruction();
-
-		if (!ins) {
-
-			return cpu.exit();
-
+		function _resume() {
+			cpu.resume([].slice.call(arguments));
 		}
 
-		if (insType.async === ins._type) {
-			/**
-			 *  异步操作
-			 * */
-			return cpu.runInstruction(ins);
+		func(exec, cpu.GVGS, _resume);
 
-		} else {
-			cpu.runInstruction(ins);
-		}
+		function run() {
 
-		/**
-		 * tail call
-		 * */
-		return run();
-	}
+			var ins = cpu.stack.nextInstruction();
 
-	var running = false;
+			if (!ins) {
 
-	function future(handler) {
+				return cpu.exit();
 
-		if (running) {
-			throw new Error("Already running");
-		}
-
-		running = true;
-
-		if (handler) {
-			if ("function" != typeof handler) {
-				throw TypeError("The handler must be a function!");
 			}
 
-			cpu.SRS.handler = handler;
+			if (insType.async === ins._type) {
+				/**
+				 *  异步操作
+				 * */
+				return cpu.runInstruction(ins);
+
+			} else {
+				cpu.runInstruction(ins);
+			}
+
+			/**
+			 * tail call
+			 * */
+			return run();
 		}
-		run();
+
+		var running = false;
+
+		function future(handler) {
+
+			if (running) {
+				throw new Error("Already running");
+			}
+
+			running = true;
+
+			if (handler) {
+				if ("function" != typeof handler) {
+					throw TypeError("The handler must be a function!");
+				}
+
+				cpu.SRS.handler = handler;
+			}
+			run();
+		}
+
+		future._runtime_cpu = true;
+
+		return future;
 	}
 
-	future._runtime_cpu = true;
+	try {
 
-	return future;
-}
+		module.exports = cc;
 
-try {
+	} catch (e) {}
 
-	module.exports = cc;
+	try {
 
-} catch (e) {}
+		window.cc = cc;
 
-try {
-
-	window.cc = cc;
-
-} catch (e) {}
+	} catch (e) {}
 })();
