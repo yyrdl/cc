@@ -1,4 +1,8 @@
-## CC
+[build_status]:https://travis-ci.org/yyrdl/cc.svg?branch=master
+[coverage_status_url]:https://coveralls.io/repos/github/yyrdl/cc/badge.svg?branch=master
+[coverage_page]:https://coveralls.io/github/yyrdl/cc?branch=master
+ 
+## CC  ![build status][build_status] [![Coverage Status][coverage_status_url]][coverage_page]
 
 > cc 《叛逆的鲁鲁修》中的谜之女子
 
