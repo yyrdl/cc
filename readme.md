@@ -2,63 +2,76 @@
 [coverage_status_url]:https://coveralls.io/repos/github/yyrdl/cc/badge.svg?branch=master
 [coverage_page]:https://coveralls.io/github/yyrdl/cc?branch=master
  
-## CC  ![build status][build_status] [![Coverage Status][coverage_status_url]][coverage_page]
+# CC  ![build status][build_status] [![Coverage Status][coverage_status_url]][coverage_page]
 
-> cc 《叛逆的鲁鲁修》中的谜之女子
+> cc : a mystical women in 《Code Geass》
 
-基于ES5语法的异步代码同步编写模块,无需转译，基本兼容所有的javascript解释器。
+A solution to write sync code, based on most basic JS grammar,no need to translating ,compatible with all JS runtime.
 
-## 用法
+# Usage
 
 
-浏览器中的使用示例:
+`<script type="text/javascript" src="./cc.min.js"></script>`
 
-首先将项目目录下的index.js文件引入你的页面.
+> In node.js just `npm install cc_co` and require it.
 
->node.js端 获取方式：`npm install cc_co`
+
+Let's show how to write sync code .
 
 ```js
-cc(function(exec,ctx,resume){
-   //执行一个异步请求
-   exec.async(ajax.get).assign("page")("/page",resume);
-   
-   exec(function(){
-      console.log(ctx.page);//取得上一步请求服务器返回的结果
-   })
 
-})()
+  cc(function(exec,ctx,resume){
+
+       // launch $.post (provided by jquery) ,assign the result to "info"
+       // "/search",{"key":"cc"} and `resume` are the arguments of $.post.
+
+       exec.async($.post).assign("info")("/search",{"key":"cc"},resume);
+
+       exec(function(){
+          //get the detail
+          exec.async($.get).assign("detail")("/detail",ctx.info.detail,resume);
+
+       });
+
+       exec(function(){
+         // print the detail of key "cc" at end
+         console.log(ctx.detail);
+       });
+
+  })()
+
 ```
 
-包含所有功能的例子:
+
+A more complex example:
 
 ```js
 
 
 
  
-// 异步操作的代表函数,简单做加和操作
+// the representative of all async operations
 
-function async_func(a, func) {
+function async_func(func) {
 	setTimeout(function () {
-		func(a+Math.floor(Math.random()*100));
+		func("hello world");
 	}, 100);
 }
 
-// 以同步的方式书写异步执行的代码
-function sync_code() {
+// write code in sync way
 
+function sync_code() {
     return cc(function (exec,ctx,resume) {
 
-        /**
-         * 执行setTimeout 等待一秒
-         * */
+        // wait 1 second
+
         exec.async(setTimeout)(resume,1000);
+        
+        //run a loop
+        //Attention:Do not use "for,while" that provided by the JS language here,
+        //it will make a conflict with cc.
 
         let i = 0;
-
-        
-        //注意不建议使用语言自带的循环，因为cc的工作原理是先获得指令序列再执行，直接使用for可能引发错误
-         
         exec.for(function () {
 
             if( i >= 5){
@@ -66,26 +79,25 @@ function sync_code() {
                 //or
                 //exec.return(ctx.v);
             }
-            
-			//执行一个异步方法，100和 resume是他的调用参数，并将结果命名为"v",后面通过ctx去获得
-			
-            exec.async(async_func).assign("v")(100,resume);
-            // 这里用了一下箭头函数，考虑兼容性的话应该使用function
-            exec(()=>{
-                
-                //获取上一步执行的结果并打印
-				
+
+            //run the function "async_func" ,and set the result as "v";
+
+            exec.async(async_func).assign("v")(resume);
+
+
+            exec(function(){
+            // print the result "v"
                 console.log("v:"+ctx.v);
                 i++;
             });
 
         });
         /**
-         * 返回最后的v ，注意，不能直接exec.return(ctx.v);
-         * 但是可以在exec.break()的前一行这样做，理由是js解释器执行到这里时
-         * 上面的循环还没有被执行，ctx.v还未被赋值，稍后cc库才会去执行循环.
-		 *
-		 * PS: exec.return 可以返回多值，比如：exec.return(1,2,3,4,5);
+         *  return "v" and end.
+         *
+         *  we can't run "exec.return(ctx.v)" directly here ,because the loop haven't be executed by cc yet.
+         *
+         *  More: you can return multiple result ,like "exec.return(1,2,3,4,5)"
          * */
         exec.return(exec(function () {
             return ctx.v;
@@ -95,10 +107,10 @@ function sync_code() {
 
 }
 
-//调用上面的函数，也演示了如何嵌套使用
+// invoke function "sync code" by cc
 cc(function (exec,ctx) {
      
-    exec(sync_code()).assign("result");
+    exec(sync_code()).assign("result");// the snippet of code show the nest usage of cc
 	
     exec(function () {
         console.log(ctx.result);
@@ -106,7 +118,7 @@ cc(function (exec,ctx) {
 
 })();
 
-//或者直接调用
+//or invoke directly
 sync_code(function(err,result){
     if(err){
 	  console.log(err);
@@ -116,9 +128,15 @@ sync_code(function(err,result){
 });
 ```
 
-# 原理
+# Theory
 
-一个操作指令由操作方法，参数，返回值三大部分组成，无论异步还是同步函数都是如此。指令序列可以同步书写，cc只需要保证指令是按照书写的顺序执行即可。
-所以cc第一步先获得指令序列，第二步是按顺序解释执行指令。需要思考的是代码的书写方式，既要满足功能预期，又不能比回调嵌套复杂,最终设计成这样的形式。
+An operation  consists of method , arguments and result, no matter if the operation is asynchronous or synchronous.
 
-__exec的每次调用都生成一条指令，指令是按书写的逻辑顺序依次执行的，非exec表述的逻辑不保证执行顺序。__
+And we know that it will be executed in async way ,but we just want to writing  sync code in form , and cc created this form.
+
+cc regards each operation as an instruction , instruction is written in order . At first ,cc will get the instruction list,
+
+second cc run each instruction in order , so that the difference between async and sync operations will be shielded.
+
+
+__Each run of `exec` will create an instruction，instruction will be executed in logic order， can't guarantee the order of code that dose not expressed by `exec`.__
