@@ -1,10 +1,15 @@
 {
   "name": "cc_co",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "flow-control based on es5",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --harmony node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --report lcovonly -- --reporter dot"
+  },
+  "devDependencies": {
+    "istanbul-harmony": "0",
+    "mocha": "*",
+    "path": "*"
   },
   "repository": {
     "type": "git",

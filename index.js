@@ -408,7 +408,6 @@
 			cpu.resume([].slice.call(arguments));
 		}
 
-		func(exec, cpu.GVGS, _resume);
 
 		function run() {
 
@@ -453,7 +452,22 @@
 
 				cpu.SRS.handler = handler;
 			}
-			run();
+			var error = null;
+
+			try{
+
+				func(exec, cpu.GVGS, _resume);
+
+			}catch (e){
+				error = e;
+			}
+
+			if(error === null){
+				run();
+			}else {
+				cpu.exit(error);
+			}
+
 		}
 
 		future._runtime_cpu = true;
