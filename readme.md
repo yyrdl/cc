@@ -41,6 +41,31 @@ Let's show how to write sync code .
   })()
 
 ```
+An example of Promise
+
+```js
+
+function pro(){
+    return new Promise(function(resolve,reject){
+          Math.random() > 0.5 ? resolve("ok") : reject(new Error("Manual Error"))
+    });
+}
+
+cc(function(exec,ctx,resume){
+    
+   exec(pro).assign("result");
+
+   exec(function(){
+       var error = ctx.result[0],value = ctx.result[1];
+       if(error){
+           console.log(error);
+       }else{
+           console.log(value);
+       }
+   })
+})();
+
+```
 
 
 A more complex example:
@@ -110,7 +135,7 @@ function sync_code() {
 // invoke function "sync code" by cc
 cc(function (exec,ctx) {
      
-    exec(sync_code()).assign("result");// the snippet of code show the nest usage of cc
+    exec(sync_code).assign("result");// the snippet of code show the nest usage of cc
 	
     exec(function () {
         console.log(ctx.result);
