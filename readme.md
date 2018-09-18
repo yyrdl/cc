@@ -52,7 +52,7 @@ function pro(){
 }
 
 cc(function(exec,ctx,resume){
-    
+
    exec(pro).assign("result");
 
    exec(function(){
@@ -97,6 +97,7 @@ function sync_code() {
         //it will make a conflict with cc.
 
         let i = 0;
+        
         exec.for(function () {
 
             if( i >= 5){
@@ -124,10 +125,10 @@ function sync_code() {
          *
          *  More: you can return multiple result ,like "exec.return(1,2,3,4,5)"
          * */
-        exec.return(exec(function () {
-            return ctx.v;
-        }));
-
+        exec(function(){
+            exec.return(ctx.v);
+        });
+    
     });
 
 }
