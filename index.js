@@ -249,16 +249,24 @@
 			func._ins = ins;
 			return func;
 		};
-		
 		exec.return = function () {
 			var result = [].slice.call(arguments);
-			return cpu.exit(null,result);
+			var ins = new Instruction(function () {
+					var final_result = [];
+					for (var i = 0; i < result.length; i++) {
+						if (result[i] && ("function" === typeof result[i]) && (result[i]._ins instanceof Instruction)) {
+							final_result[i] = result[i]._ins.result();
+						} else {
+							final_result[i] = result[i];
+						}
+					}
+					cpu.exit(null, final_result);
+				}, insType.normal);
+			cpu.stack.push(ins);
 		};
-
 		function _resume() {
 			cpu.resume([].slice.call(arguments));
 		}
-
 		function run() {
 			var ins = cpu.stack.nextInstruction();
 			if (!ins) {
@@ -266,9 +274,7 @@
 			}
 			return cpu.runInstruction(ins);
 		}
-
 		var running = false;
-
 		function future(handler) {
 			if (running) {
 				throw new Error("Already running");
