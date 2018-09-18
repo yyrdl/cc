@@ -118,9 +118,9 @@ describe("basic",function () {
        cc(function (exec,ctx,resume) {
            exec.async(async_func).assign("result")(resume);
 
-           exec.return(exec(function () {
-               return ctx.result[0];
-           }));
+           exec(function(){
+               exec.return(ctx.result[0]);
+           });
 
        })(function (err,result) {
 

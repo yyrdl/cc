@@ -124,10 +124,10 @@ function sync_code() {
          *
          *  More: you can return multiple result ,like "exec.return(1,2,3,4,5)"
          * */
-        exec.return(exec(function () {
-            return ctx.v;
-        }));
-
+        exec(function(){
+            exec.return(ctx.v);
+        });
+    
     });
 
 }

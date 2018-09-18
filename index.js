@@ -250,19 +250,7 @@
 			return func;
 		};
 		exec.return = function () {
-			var result = [].slice.call(arguments);
-			var ins = new Instruction(function () {
-					var final_result = [];
-					for (var i = 0; i < result.length; i++) {
-						if (result[i] && ("function" === typeof result[i]) && (result[i]._ins instanceof Instruction)) {
-							final_result[i] = result[i]._ins.result();
-						} else {
-							final_result[i] = result[i];
-						}
-					}
-					cpu.exit(null, final_result);
-				}, insType.normal);
-			cpu.stack.push(ins);
+			return cpu.exit(null,[].slice.call(arguments));
 		};
 		function _resume() {
 			cpu.resume([].slice.call(arguments));
